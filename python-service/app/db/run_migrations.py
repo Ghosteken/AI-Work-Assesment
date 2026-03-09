@@ -170,6 +170,7 @@ def main() -> None:
 
     database_url = _get_database_url()
     conninfo = _to_psycopg_conninfo(database_url)
+    print(f"DEBUG: Using conninfo: {conninfo}")
 
     if not MIGRATIONS_DIR.exists():
         raise RuntimeError(f'Migrations directory not found: {MIGRATIONS_DIR}')
