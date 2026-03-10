@@ -1,9 +1,37 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.db.session import get_db
+from app.db.base import Base
+
+# Setup a test database (in-memory SQLite)
+SQLALCHEMY_DATABASE_URL = "sqlite://"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
@@ -44,7 +72,9 @@ def test_create_briefing_validation_failure():
     }
     response = client.post("/briefings", json=payload)
     assert response.status_code == 422
-    assert "At least 2 key points are required" in response.text
+    # Check if the error message is present in any of the detail items
+    errors = response.json().get("detail", [])
+    assert any("At least 2 key points are required" in err.get("msg", "") for err in errors)
 
     # Duplicate metrics
     payload["keyPoints"].append("Point 2")
@@ -54,7 +84,8 @@ def test_create_briefing_validation_failure():
     ]
     response = client.post("/briefings", json=payload)
     assert response.status_code == 422
-    assert "Metric names must be unique" in response.text
+    errors = response.json().get("detail", [])
+    assert any("Metric names must be unique" in err.get("msg", "") for err in errors)
 
 def test_generate_and_get_html():
     # 1. Create
