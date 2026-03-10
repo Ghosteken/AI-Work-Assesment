@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f9f9f9;
+        }
+        .report-container {
+            background-color: #fff;
+            padding: 50px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-top: 8px solid #2c3e50;
+        }
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .company-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .info-item label {
+            display: block;
+            font-weight: bold;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        .info-item span {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        section {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-top: 0;
+            text-align: justify;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .metric-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric-card .value {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .metric-card .name {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        .recommendation-box {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            font-style: italic;
+        }
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #95a5a6;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <header>
+            <h1>{{ title }}</h1>
+        </header>
+
+        <div class="company-info">
+            <div class="info-item">
+                <label>Company</label>
+                <span>{{ company_name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Ticker</label>
+                <span>{{ ticker }}</span>
+            </div>
+            <div class="info-item">
+                <label>Sector</label>
+                <span>{{ sector }}</span>
+            </div>
+            <div class="info-item">
+                <label>Analyst</label>
+                <span>{{ analyst_name }}</span>
+            </div>
+        </div>
+
+        <section>
+            <h2>Executive Summary</h2>
+            <p>{{ summary }}</p>
+        </section>
+
+        <section>
+            <h2>Key Points</h2>
+            <ul>
+                {% for point in key_points %}
+                <li>{{ point }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section>
+            <h2>Risks</h2>
+            <ul>
+                {% for risk in risks %}
+                <li>{{ risk }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section>
+            <h2>Recommendation</h2>
+            <div class="recommendation-box">
+                {{ recommendation }}
+            </div>
+        </section>
+
+        {% if metrics %}
+        <section>
+            <h2>Metrics</h2>
+            <div class="metrics-grid">
+                {% for metric in metrics %}
+                <div class="metric-card">
+                    <span class="value">{{ metric.value }}</span>
+                    <span class="name">{{ metric.name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <footer>
+            InsightOps Internal Briefing Report &bull; Generated on {{ generated_at }}
+        </footer>
+    </div>
+</body>
+</html>
